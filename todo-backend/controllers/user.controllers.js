@@ -27,7 +27,17 @@ const loginUser = async (req, res) => {
         // if not matched return
         // generate jwt access token valid for 15 minutes
         const accessToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET_KEY, { expiresIn: 60*5 }); // token valid for  secs
-        res.status(200).json({ msg: 'User login success', accessToken: accessToken });
+         res.status(200).json({ 
+            success: true,
+            message: 'User login success', 
+            token: accessToken,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email
+                // Don't send password back!
+            }
+        });
 
         // After login success, console pending todos of logged user
         // get id by using email
