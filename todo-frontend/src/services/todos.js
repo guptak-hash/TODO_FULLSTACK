@@ -1,20 +1,38 @@
 // src/services/todos.js
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+const API_URL = 'http://localhost:3000/api';
 
 export const getTodos = async (token) => {
-  const response = await fetch(`${API_URL}/todos`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
+    try {
+        const response = await fetch(`${API_URL}/todos`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to fetch todos');
-  }
+        const data = await response.json();
+        
+        // if (!response.ok) {
+        //     throw new Error(data.message || 'Failed to fetch todos');
+        // }
 
-  return response.json();
+        if (!data.success) {
+            // Handle cases where success is false but status code is 200
+            console.log('No todos found:', data.message);
+            return { todos: [], count: 0, source: 'none' };
+        }
+
+        return {
+            todos: data.todos || [],
+            count: data.count || 0,
+            source: data.source || 'unknown',
+            message: data.message
+        };
+        
+    } catch (error) {
+        console.error('Fetch todos error:', error);
+        throw new Error(error.message || 'Network error while fetching todos');
+    }
 };
 
 export const createTodo = async (todo, token) => {

@@ -1,5 +1,5 @@
 // src/services/auth.js
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+const API_URL = 'http://localhost:3000/api';
 
 export const login = async (credentials) => {
   const response = await fetch(`${API_URL}/login`, {
@@ -9,12 +9,13 @@ export const login = async (credentials) => {
     },
     body: JSON.stringify(credentials),
   });
-
+  // const data=await response.json()
+// console.log('response inside auth.js >> ',data)
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Login failed');
   }
-
+ 
   return response.json();
 };
 

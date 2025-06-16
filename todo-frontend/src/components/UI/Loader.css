@@ -1,0 +1,9 @@
+/* src/components/UI/Loader.css */
+.loader-container p {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.loader {
+  border-top-color: var(--primary-color);
+}
