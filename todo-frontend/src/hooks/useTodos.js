@@ -39,20 +39,7 @@ export const useTodos = () => {
     }
   };
 
-  // const toggleTodoStatus = async (id) => {
-  //   try {
-  //     const todoToUpdate = todos.find(todo => todo._id === id);
-  //     const updatedTodo = await apiUpdateTodo(id, 
-  //       { status: todoToUpdate.status === 'Pending' ? 'Completed' : 'Pending' }, 
-  //       token
-  //     );
-  //     setTodos(prev => prev.map(todo => 
-  //       todo._id === id ? updatedTodo.todo : todo
-  //     ));
-  //   } catch (err) {
-  //     setError(err.message);
-  //   }
-  // };
+  
 
   const removeTodo = async (id) => {
     try {
@@ -68,18 +55,6 @@ export const useTodos = () => {
   }, [token]);
 
 
-  // In your useTodos hook
-// const updateTodo = async (id, updates) => {
-//   try {
-//     const updatedTodo = await apiUpdateTodo(id, updates, token);
-//     setTodos(prev => prev.map(todo => 
-//       todo._id === id ? updatedTodo : todo
-//     ));
-//   } catch (err) {
-//     setError(err.message);
-//     throw err;
-//   }
-// };
 
 const updateTodo = async (id, updates) => {
   try {
@@ -98,6 +73,5 @@ const updateTodo = async (id, updates) => {
 
 // Add this to the returned object
 return { todos, loading, error, addTodo, removeTodo, updateTodo };
-// toggleTodoStatus
-  // return { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, refreshTodos: fetchTodos };
+
 };

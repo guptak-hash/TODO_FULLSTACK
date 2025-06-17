@@ -1,5 +1,5 @@
 // src/App.js
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, HashRouter} from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import PrivateRoute from './components/Auth/PrivateRoute';
@@ -9,10 +9,11 @@ import TodoList from './components/Todo/TodoList';
 import Header from './components/Layout/Header';
 import './styles/themes.css';
 import './styles/utilities.css';
+// import { HashRouter } from 'react-router-dom'
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <AuthProvider>
         <ThemeProvider>
           <div className="app-container">
@@ -21,18 +22,19 @@ function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/" element={<Login />} />
                 <Route path="/todos" element={
                   <PrivateRoute>
                     <TodoList />
                   </PrivateRoute>
                 } />
-                <Route path="/" element={<Navigate to="/todos" replace />} />
+                {/* <Route path="/" element={<Navigate to="/todos" replace />} /> */}
               </Routes>
             </main>
           </div>
         </ThemeProvider>
       </AuthProvider>
-    </Router>
+    </HashRouter>
   );
 }
 
