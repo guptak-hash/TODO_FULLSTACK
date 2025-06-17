@@ -1,4 +1,6 @@
-const redis = require('../config/redis');
+// const redis = require('../config/redis');
+
+const redisClient = require('../config/redis');
 const TodoModel = require('../models/todo.model')
 const UserModel = require("../models/user.model");
 
@@ -25,7 +27,7 @@ const newTodo = async (req, res) => {
         });
 
         // 3. Invalidate Redis cache
-        await redis.del(userId);
+        await redisClient.del(userId);
 
         // 4. Return success response
         return res.status(201).json({
@@ -65,7 +67,7 @@ const getTodos = async (req, res) => {
         
         // First check Redis cache
         let todos;
-        const cacheData = await redis.get(userId);
+        const cacheData = await redisClient.get(userId);
         
         if (!cacheData) {
             // Cache miss - fetch from database
@@ -80,7 +82,7 @@ const getTodos = async (req, res) => {
             }
             
             // Set in Redis with 3 minute expiry
-            await redis.set(userId, JSON.stringify(todos), 'EX', 180);
+            await redisClient.set(userId, JSON.stringify(todos), 'EX', 180);
             
             return res.status(200).json({ 
                 success: true,
@@ -177,7 +179,7 @@ const deleteTodo = async (req, res) => {
         const deletedTodo = await TodoModel.findByIdAndDelete(id);
         
         // 3. Invalidate Redis cache
-        await redis.del(userId);
+        await redisClient.del(userId);
 
         // 4. Return success response
         return res.status(200).json({ 
