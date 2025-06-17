@@ -33,26 +33,26 @@ export const useTodos = () => {
     try {
       const newTodo = await apiCreateTodo(todo, token);
       // const newTodoData=await newTodo.json()
-      setTodos(prev => [...prev, newTodo.todo]);
+      setTodos(prev => [...prev, newTodo.todo]);  
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const toggleTodoStatus = async (id) => {
-    try {
-      const todoToUpdate = todos.find(todo => todo._id === id);
-      const updatedTodo = await apiUpdateTodo(id, 
-        { status: todoToUpdate.status === 'Pending' ? 'Completed' : 'Pending' }, 
-        token
-      );
-      setTodos(prev => prev.map(todo => 
-        todo._id === id ? updatedTodo : todo
-      ));
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  // const toggleTodoStatus = async (id) => {
+  //   try {
+  //     const todoToUpdate = todos.find(todo => todo._id === id);
+  //     const updatedTodo = await apiUpdateTodo(id, 
+  //       { status: todoToUpdate.status === 'Pending' ? 'Completed' : 'Pending' }, 
+  //       token
+  //     );
+  //     setTodos(prev => prev.map(todo => 
+  //       todo._id === id ? updatedTodo.todo : todo
+  //     ));
+  //   } catch (err) {
+  //     setError(err.message);
+  //   }
+  // };
 
   const removeTodo = async (id) => {
     try {
@@ -83,11 +83,13 @@ export const useTodos = () => {
 
 const updateTodo = async (id, updates) => {
   try {
+    console.log('inside useTodos>> id>> updates>>',id,updates)
     const updatedTodo = await apiUpdateTodo(id, updates, token);
     setTodos(prev => prev.map(todo => 
-      todo._id === id ? { ...todo, ...updatedTodo } : todo
+      todo._id === id ? { ...todo, ...updatedTodo.todo } : todo
     ));
-    return updatedTodo;
+    console.log('inside useTodos>> updateTodo>> ',updatedTodo)
+    return updatedTodo
   } catch (err) {
     setError(err.message);
     throw err;
@@ -95,7 +97,7 @@ const updateTodo = async (id, updates) => {
 };
 
 // Add this to the returned object
-return { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, updateTodo };
-
+return { todos, loading, error, addTodo, removeTodo, updateTodo };
+// toggleTodoStatus
   // return { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, refreshTodos: fetchTodos };
 };

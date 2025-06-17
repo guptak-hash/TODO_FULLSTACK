@@ -7,7 +7,8 @@ import Loader from '../UI/Loader';
 
 const TodoList = () => {
   // const { todos, loading, error, addTodo, toggleTodoStatus, removeTodo } = useTodos();
-   const { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, updateTodo } = useTodos();
+  // toggleTodoStatus
+   const { todos, loading, error, addTodo, removeTodo, updateTodo } = useTodos();
 // console.log(`loading>> ${loading} || error>> ${error}`)
   if (loading && !todos.length) return <Loader />;
   if (error) return <div className="error-message">{error}</div>;
@@ -33,7 +34,7 @@ const TodoList = () => {
             <TodoItem
       key={todo._id}
       todo={todo}
-      onToggle={toggleTodoStatus}
+      // onToggle={toggleTodoStatus}
       onDelete={removeTodo}
       onUpdate={updateTodo}
     />
