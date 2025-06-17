@@ -26,7 +26,7 @@ const loginUser = async (req, res) => {
         if (user.password !== password) return res.status(400).json({ msg: "Wrong password" });
         // if not matched return
         // generate jwt access token valid for 15 minutes
-        const accessToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET_KEY, { expiresIn: 60*5 }); // token valid for  secs
+        const accessToken = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET_KEY, { expiresIn: 60*2 }); // token valid for  secs
          res.status(200).json({ 
             success: true,
             message: 'User login success', 
