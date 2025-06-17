@@ -32,7 +32,8 @@ export const useTodos = () => {
   const addTodo = async (todo) => {
     try {
       const newTodo = await apiCreateTodo(todo, token);
-      setTodos(prev => [...prev, newTodo]);
+      // const newTodoData=await newTodo.json()
+      setTodos(prev => [...prev, newTodo.todo]);
     } catch (err) {
       setError(err.message);
     }
@@ -66,5 +67,35 @@ export const useTodos = () => {
     fetchTodos();
   }, [token]);
 
-  return { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, refreshTodos: fetchTodos };
+
+  // In your useTodos hook
+// const updateTodo = async (id, updates) => {
+//   try {
+//     const updatedTodo = await apiUpdateTodo(id, updates, token);
+//     setTodos(prev => prev.map(todo => 
+//       todo._id === id ? updatedTodo : todo
+//     ));
+//   } catch (err) {
+//     setError(err.message);
+//     throw err;
+//   }
+// };
+
+const updateTodo = async (id, updates) => {
+  try {
+    const updatedTodo = await apiUpdateTodo(id, updates, token);
+    setTodos(prev => prev.map(todo => 
+      todo._id === id ? { ...todo, ...updatedTodo } : todo
+    ));
+    return updatedTodo;
+  } catch (err) {
+    setError(err.message);
+    throw err;
+  }
+};
+
+// Add this to the returned object
+return { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, updateTodo };
+
+  // return { todos, loading, error, addTodo, toggleTodoStatus, removeTodo, refreshTodos: fetchTodos };
 };

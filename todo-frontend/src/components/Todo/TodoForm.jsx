@@ -3,10 +3,11 @@ import { useState } from 'react';
 import Button from '../UI/Button';
 
 const TodoForm = ({ onAdd }) => {
+  // console.log('onAdd >> ',onAdd)
   const [todo, setTodo] = useState({
     title: '',
     description: '',
-    // status: 'Pending'
+    status: 'Pending'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -16,11 +17,12 @@ const TodoForm = ({ onAdd }) => {
     
     setIsSubmitting(true);
     try {
+      console.log('todo inside TodoForm>> ',todo)
       await onAdd(todo);
       setTodo({
         title: '',
         description: '',
-        // status: 'pending'
+        status: 'Pending'
       });
     } finally {
       setIsSubmitting(false);

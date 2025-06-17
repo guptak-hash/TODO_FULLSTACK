@@ -36,21 +36,40 @@ export const getTodos = async (token) => {
 };
 
 export const createTodo = async (todo, token) => {
-  const response = await fetch(`${API_URL}/todo`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(todo),
-  });
+    try {
+        const response = await fetch(`${API_URL}/todo`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                title: todo.title,
+                description: todo.description,
+                status: todo.status || 'Pending'
+            }),
+        });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to create todo');
-  }
+        const data = await response.json();
 
-  return response.json();
+        if (!response.ok) {
+            // Handle field-specific errors
+            if (data.field) {
+                throw new Error(`${data.field}: ${data.message}`);
+            }
+            throw new Error(data.message || 'Failed to create todo');
+        }
+
+        return {
+            success: true,
+            message: data.message,
+            todo: data.todo
+        };
+
+    } catch (error) {
+        console.error('Create todo error:', error);
+        throw error; // Re-throw for handling in UI
+    }
 };
 
 export const updateTodo = async (id, updates, token) => {
@@ -72,17 +91,33 @@ export const updateTodo = async (id, updates, token) => {
 };
 
 export const deleteTodo = async (id, token) => {
-  const response = await fetch(`${API_URL}/todo/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
+    try {
+        const response = await fetch(`${API_URL}/todo/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to delete todo');
-  }
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to delete todo');
+        }
 
-  return response.json();
+        if (!data.success) {
+            throw new Error(data.message || 'Todo deletion unsuccessful');
+        }
+
+        return {
+            success: true,
+            deletedId: data.deletedId,
+            message: data.message,
+            todo: data.deletedTodo
+        };
+        
+    } catch (error) {
+        console.error('Delete todo error:', error);
+        throw error; // Re-throw for error handling in components
+    }
 };
