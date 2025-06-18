@@ -66,9 +66,10 @@ const getTodos = async (req, res) => {
         const { userId } = req; // Get userId from authenticated request
         
         // First check Redis cache
-        let todos;
-        const cacheData = await redisClient.get(userId);
-        
+        // let todos;
+        // const cacheData = await redisClient.get(userId);
+        const cacheKey = `todos:${userId}`; // User-specific cache
+    const cacheData = await redisClient.get(cacheKey);
         if (!cacheData) {
             // Cache miss - fetch from database
             todos = await TodoModel.find({ createdBy: userId });
@@ -82,7 +83,7 @@ const getTodos = async (req, res) => {
             }
             
             // Set in Redis with 3 minute expiry
-            await redisClient.set(userId, JSON.stringify(todos), 'EX', 180);
+            await redisClient.set(cacheKey, JSON.stringify(todos), 'EX', 180);
             
             return res.status(200).json({ 
                 success: true,
