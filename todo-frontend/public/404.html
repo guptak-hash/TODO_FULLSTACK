@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script>
+      const segment = 1;
+      const url = location.href.replace(/^https?:\/\/[^/]+/, '');
+      const urlSegments = url.split('/').filter(Boolean);
+      const repoName = urlSegments[0] || '';
+      sessionStorage.redirect = '/' + urlSegments.slice(segment).join('/');
+      location.href = `/${repoName}/#` + sessionStorage.redirect;
+    </script>
+  </head>
+  <body>
+    Redirecting...
+  </body>
+</html>

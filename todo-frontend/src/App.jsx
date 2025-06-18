@@ -1,5 +1,6 @@
 // src/App.js
-import { BrowserRouter as Router, Routes, Route, Navigate, HashRouter} from 'react-router-dom';
+// import { BrowserRouter as Router, Routes, Route, Navigate, HashRouter} from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import PrivateRoute from './components/Auth/PrivateRoute';
