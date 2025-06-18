@@ -1,6 +1,4 @@
-// const redis = require('../config/redis');
-
-const redisClient = require('../config/redis');
+const redis = require('../config/redis');
 const TodoModel = require('../models/todo.model')
 const UserModel = require("../models/user.model");
 
@@ -61,57 +59,95 @@ const newTodo = async (req, res) => {
     }
 };
 
+// const getTodos = async (req, res) => {
+//     try {
+//         const { userId } = req; // Get userId from authenticated request
+        
+//         // First check Redis cache
+//         let todos;
+//     const cacheData = await redis.get(userId);
+//         if (!cacheData) {
+//             // Cache miss - fetch from database
+//             todos = await TodoModel.find({ createdBy: userId });
+            
+//             if (!todos.length) {
+//                 return res.status(200).json({ 
+//                     success: true,
+//                     message: "No todos found",
+//                     todos: []
+//                 });
+//             }
+            
+//             // Set in Redis with 3 minute expiry
+//             await redis.set(userId, JSON.stringify(todos), 'EX', 180);
+            
+//             return res.status(200).json({ 
+//                 success: true,
+//                 message: 'Todos retrieved from database',
+//                 source: 'database',
+//                 todos,
+//                 count: todos.length
+//             });
+//         } else {
+//             // Cache hit
+//             todos = JSON.parse(cacheData);
+//             return res.status(200).json({ 
+//                 success: true,
+//                 message: 'Todos retrieved from cache',
+//                 source: 'redis',
+//                 todos,
+//                 count: todos.length
+//             });
+//         }
+        
+//     } catch (err) {
+//         console.error('Get todos error:', err);
+//         return res.status(500).json({ 
+//             success: false,
+//             message: 'Internal server error',
+//             error: err.message
+//         });
+//     }
+// };
+
 const getTodos = async (req, res) => {
-    try {
-        const { userId } = req; // Get userId from authenticated request
-        
-        // First check Redis cache
-        // let todos;
-        // const cacheData = await redisClient.get(userId);
-        const cacheKey = `todos:${userId}`; // User-specific cache
-    const cacheData = await redisClient.get(cacheKey);
-        if (!cacheData) {
-            // Cache miss - fetch from database
-            todos = await TodoModel.find({ createdBy: userId });
-            
-            if (!todos.length) {
-                return res.status(200).json({ 
-                    success: true,
-                    message: "No todos found",
-                    todos: []
-                });
-            }
-            
-            // Set in Redis with 3 minute expiry
-            await redisClient.set(cacheKey, JSON.stringify(todos), 'EX', 180);
-            
-            return res.status(200).json({ 
-                success: true,
-                message: 'Todos retrieved from database',
-                source: 'database',
-                todos,
-                count: todos.length
-            });
-        } else {
-            // Cache hit
-            todos = JSON.parse(cacheData);
-            return res.status(200).json({ 
-                success: true,
-                message: 'Todos retrieved from cache',
-                source: 'redis',
-                todos,
-                count: todos.length
-            });
-        }
-        
-    } catch (err) {
-        console.error('Get todos error:', err);
-        return res.status(500).json({ 
-            success: false,
-            message: 'Internal server error',
-            error: err.message
-        });
+  try {
+    const { userId } = req;
+    let todos;
+    let source = 'database';
+
+    // Only attempt Redis in development
+    if (process.env.NODE_ENV !== 'production') {
+      const cacheData = await redis.get(`todos:${userId}`);
+      if (cacheData) {
+        todos = JSON.parse(cacheData);
+        source = 'redis';
+      }
     }
+
+    if (!todos) {
+      todos = await TodoModel.find({ createdBy: userId });
+      
+      if (process.env.NODE_ENV !== 'production') {
+        await redis.set(`todos:${userId}`, JSON.stringify(todos), 'EX', 180);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Todos retrieved from ${source}`,
+      source,
+      todos,
+      count: todos.length
+    });
+
+  } catch (err) {
+    console.error('Error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
 };
 
 // const updateTodo = async (req, res) => {

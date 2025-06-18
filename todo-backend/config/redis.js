@@ -1,33 +1,36 @@
-const redis = require('redis');
+const Redis = require("ioredis");
 require('dotenv').config();
 
-const isProduction = process.env.NODE_ENV === 'production';
+let redisClient;
 
-const redisConfig = isProduction 
-  ? {
-      socket: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        tls: true
-      },
-      username: process.env.REDIS_USER,
-      password: process.env.REDIS_PASSWORD
+if (process.env.NODE_ENV !== 'production') {
+  // Local development configuration
+  redisClient = new Redis({
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: process.env.REDIS_PORT || 6379,
+    retryStrategy: (times) => {
+      const delay = Math.min(times * 50, 2000);
+      return delay;
     }
-  : {
-      socket: {
-        host: process.env.REDIS_HOST || '127.0.0.1',
-        port: process.env.REDIS_PORT || 6379
-      }
-    };
+  });
 
-const redisClient = redis.createClient(redisConfig);
+  redisClient.on('connect', () => {
+    console.log('Connected to local Redis');
+  });
 
-redisClient.on('error', (err) => {
-  console.error('Redis error:', err.message);
-});
-
-redisClient.connect()
-  .then(() => console.log(`Connected to ${isProduction ? 'Redis Cloud' : 'local Redis'}`))
-  .catch(err => console.error('Redis connection failed:', err));
+  redisClient.on('error', (err) => {
+    console.error('Local Redis error:', err.message);
+  });
+} else {
+  // Production mock (Render)
+  redisClient = {
+    get: async () => null,
+    set: async () => 'OK',
+    del: async () => 1,
+    on: () => {},
+    quit: async () => {}
+  };
+  console.log('Running in production - Redis disabled');
+}
 
 module.exports = redisClient;
